@@ -187,11 +187,20 @@ public class Game {
                         handleActionCard(playerValidCard);
                     }
                 }
+                else{
+                    // Giving Message to Player about queen card
+                    isQueenCard(currentPlayer.getHand().get(playerChoice), topCard);
+                }
             }
             // Moving to the next player
             updateCurrentPlayerIndex();
         }
     }
 
+    public void isQueenCard(Card playerChoiceCard,Card topCard){
+        if (topCard.getRank() == Rank.QUEEN && playerChoiceCard == topCard)
+            System.out.println("You cannot play Queen card simultaneously: " +
+                    "Play some another Card first: ");
+    }
 
 }
