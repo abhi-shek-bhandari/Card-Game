@@ -71,6 +71,7 @@ public class Game {
     }
 
     private boolean isValidCard(List<Card> hand, Card topCard,int playerChoice) {
+        if (topCard.isActionCard()) return true;
         int counter = 0;
         for (Card card : hand) {
             if (counter++ == playerChoice && (card.getSuit() == topCard.getSuit() || card.getRank() == topCard.getRank())) {
@@ -90,7 +91,8 @@ public class Game {
         return null;
     }
 
-    public void printingInstructionstoUser(Card topCard,Player currentPlayer){
+    public void printingInstructionsToUser(Card topCard,Player currentPlayer){
+        System.out.println("\n==================================================\n");
         System.out.println("Top card: " + topCard.getSuit() + " " + topCard.getRank());
         System.out.println("Current player: " + currentPlayer.getName());
         System.out.println("Card Indexing starts from 0: ");
@@ -100,9 +102,15 @@ public class Game {
                             + validCardAccordingToSystem(currentPlayer.getHand(),topCard)
                             + " is a Valid Card for the move:");
         }
-        else System.out.println("System Suggestion: you do not have a Valid Card for the Move" +
-                "\nSuggestion: draw a card from Deck");
-        System.out.println("To Draw a Card from Deck Enter Number- 10 :");
+        else {
+            if (topCard.isActionCard()){
+                System.out.println("System Suggestion: you can play any Card for the Move");
+            }else {
+                System.out.println("System Suggestion: you do not have a Valid Card for the Move" +
+                        "\nSuggestion: draw a card from Deck");
+            }
+        }
+        System.out.println("To Draw a Card from Deck Enter Number- 20 :");
         System.out.println("Player's hand: ");
     }
 
@@ -137,7 +145,7 @@ public class Game {
             while(!validCard && (playerChoice >= hand.size() || playerChoice < 0)){
 
                 // Giving Instructions to the User About Play
-                this.printingInstructionstoUser(topCard,currentPlayer);
+                this.printingInstructionsToUser(topCard,currentPlayer);
 
                 int counter = 0;
                 for (Card card:hand) {
@@ -145,7 +153,7 @@ public class Game {
                 }
 
                 playerChoice = scanner.nextInt();
-                if (playerChoice == 10){
+                if (playerChoice == 20){
                     Card drawnCard = currentPlayer.drawCard(deck);
                     if (drawnCard != null) {
                         System.out.println(currentPlayer.getName() + " drew a card: " + drawnCard.getSuit() + " " + drawnCard.getRank());
