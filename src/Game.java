@@ -80,11 +80,26 @@ public class Game {
         return false;
     }
 
+    private Card validCardAccordingToSystem(List<Card> hand, Card topCard) {
+        int counter = 0;
+        for (Card card : hand) {
+            if (card.getSuit() == topCard.getSuit() || card.getRank() == topCard.getRank()) {
+                return card;
+            }
+        }
+        return null;
+    }
+
     public void printingInstructionstoUser(Card topCard,Player currentPlayer){
         System.out.println("Top card: " + topCard.getSuit() + " " + topCard.getRank());
         System.out.println("Current player: " + currentPlayer.getName());
         System.out.println("Card Indexing starts from 0: ");
-        if (currentPlayer.hasValidCard(topCard)) System.out.println("System Suggestion: you have a Valid Card for the Move");
+        if (currentPlayer.hasValidCard(topCard)){
+            System.out.println("System Suggestion: you have a Valid Card for the Move");
+            System.out.println("According to System: card "
+                            + validCardAccordingToSystem(currentPlayer.getHand(),topCard)
+                            + " is a Valid Card for the move:");
+        }
         else System.out.println("System Suggestion: you do not have a Valid Card for the Move" +
                 "\nSuggestion: draw a card from Deck");
         System.out.println("To Draw a Card from Deck Enter Number- 10 :");
@@ -115,9 +130,11 @@ public class Game {
 
             List<Card> hand = currentPlayer.getHand();
 
+            boolean validCard = false;
+
             // Inputting player Choice for card
             int playerChoice = -1;
-            while(playerChoice >= hand.size() || playerChoice < 0){
+            while(!validCard && (playerChoice >= hand.size() || playerChoice < 0)){
 
                 // Giving Instructions to the User About Play
                 this.printingInstructionstoUser(topCard,currentPlayer);
@@ -138,31 +155,30 @@ public class Game {
                         break;
                     }
                 }
-            }
 
-            if (gameEnded) break;
+                if (gameEnded) break;
 
-            // Checking for playing a valid card if not stopping the game
-            boolean validCard = isValidCard(currentPlayer.getHand(), topCard,playerChoice);
-            if (validCard) {
-                Card playerValidCard = currentPlayer.getHand().get(playerChoice);
-                currentPlayer.playCard(playerValidCard, topCard);
-                discardPile.add(playerValidCard);
-                topCard = playerValidCard;
+                // Checking for playing a valid card if not stopping the game
+                validCard = isValidCard(currentPlayer.getHand(), topCard,playerChoice);
+                if (validCard) {
+                    Card playerValidCard = currentPlayer.getHand().get(playerChoice);
+                    currentPlayer.playCard(playerValidCard, topCard);
+                    discardPile.add(playerValidCard);
+                    topCard = playerValidCard;
 
-                // Checking if the player has won
-                if (currentPlayer.getHand().isEmpty()) {
-                    System.out.println(currentPlayer.getName() + " has won the game!");
-                    gameEnded = true;
-                    break;
+                    // Checking if the player has won
+                    if (currentPlayer.getHand().isEmpty()) {
+                        System.out.println(currentPlayer.getName() + " has won the game!");
+                        gameEnded = true;
+                        break;
+                    }
+
+                    // Handling action cards
+                    if (playerValidCard.isActionCard()) {
+                        handleActionCard(playerValidCard);
+                    }
                 }
-
-                // Handling action cards
-                if (playerValidCard.isActionCard()) {
-                    handleActionCard(playerValidCard);
-                }
             }
-
             // Moving to the next player
             updateCurrentPlayerIndex();
         }
