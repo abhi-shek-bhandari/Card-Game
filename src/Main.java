@@ -8,7 +8,7 @@ public class Main {
         System.out.println("Enter the game supports Max 4 players:");
         Scanner scanner = new Scanner(System.in);
         while (numPlayers > 4 || numPlayers < 1) {
-            System.out.println("Enter the number of players:");
+            System.out.println("Enter the number of players from 1-4:");
             numPlayers = scanner.nextInt();
             scanner.nextLine();
         }
@@ -20,8 +20,8 @@ public class Main {
 
     private static List<Player> getPlayerNames(Scanner scanner, int numPlayers) {
         List<Player> list = new ArrayList<>();
-        for (int i = 0; i < numPlayers; i++) {
-            System.out.println("Enter the name for player " + (i+1) + ":");
+        for (int i = 1; i <= numPlayers; i++) {
+            System.out.println("Enter the name for player " + i + ":");
             list.add(new Player(scanner.nextLine()));
         }
         return list;
