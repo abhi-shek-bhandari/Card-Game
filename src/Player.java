@@ -10,6 +10,14 @@ public class Player {
         this.hand = new ArrayList<>();
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public List<Card> getHand() {
+        return hand;
+    }
+
     public boolean hasValidCard(Card topCard) {
         for (Card card : hand) {
             if (card.getSuit() == topCard.getSuit() || card.getRank() == topCard.getRank()) {
@@ -19,7 +27,7 @@ public class Player {
         return false;
     }
 
-    public void receiveInitialCards(List<Card> initialCards) {
+    public void receiveCards(List<Card> initialCards) {
         hand.addAll(initialCards);
     }
 
