@@ -23,3 +23,14 @@ Rules of the Game
 5. Run the Main class to start the game.
 6. Follow the on-screen instructions to play the game.
 7. Enjoy playing Card game with your friends!
+
+#### Bonus Feature
+In addition to the standard rules, the game includes a bonus feature where Aces, Kings, Queens, and Jacks are action cards. When one of these cards is played, the following actions occur:
+
+* Ace (A): Skip the next player in turn.
+* King (K): Reverse the sequence of who plays next.
+* Queen (Q): The next player draws two cards.
+* Jack (J): The next player draws four cards.
+
+
+Note: Actions are not stackable, meaning if a Queen is played and the next player draws two cards, they cannot play another Queen on their turn even if available.
