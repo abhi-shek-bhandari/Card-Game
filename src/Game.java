@@ -71,6 +71,7 @@ public class Game {
     }
 
     private boolean isValidCard(List<Card> hand, Card topCard,int playerChoice) {
+        if (topCard.getRank() == Rank.QUEEN && hand.get(playerChoice) == topCard) return false;
         if (topCard.isActionCard()) return true;
         int counter = 0;
         for (Card card : hand) {
