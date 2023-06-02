@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class Game {
 
@@ -69,13 +70,25 @@ public class Game {
         }
     }
 
-    private Card getValidCard(List<Card> hand, Card topCard) {
+    private boolean isValidCard(List<Card> hand, Card topCard,int playerChoice) {
+        int counter = 0;
         for (Card card : hand) {
-            if (card.getSuit() == topCard.getSuit() || card.getRank() == topCard.getRank()) {
-                return card;
+            if (counter++ == playerChoice && (card.getSuit() == topCard.getSuit() || card.getRank() == topCard.getRank())) {
+                return true;
             }
         }
-        return null;
+        return false;
+    }
+
+    public void printingInstructionstoUser(Card topCard,Player currentPlayer){
+        System.out.println("Top card: " + topCard.getSuit() + " " + topCard.getRank());
+        System.out.println("Current player: " + currentPlayer.getName());
+        System.out.println("Card Indexing starts from 0: ");
+        if (currentPlayer.hasValidCard(topCard)) System.out.println("System Suggestion: you have a Valid Card for the Move");
+        else System.out.println("System Suggestion: you do not have a Valid Card for the Move" +
+                "\nSuggestion: draw a card from Deck");
+        System.out.println("To Draw a Card from Deck Enter Number- 10 :");
+        System.out.println("Player's hand: ");
     }
 
     public void start() {
@@ -91,49 +104,66 @@ public class Game {
             player.receiveCards(initialCards);
         }
 
+        Scanner scanner = new Scanner(System.in);
+
         Card topCard = deck.drawCard();
         discardPile.add(topCard);
 
         while (!gameEnded) {
             Player currentPlayer = players.get(currentPlayerIndex);
 
-            System.out.println("Top card: " + topCard.getSuit() + " " + topCard.getRank());
-            System.out.println("Current player: " + currentPlayer.getName());
-            System.out.println("Player's hand: " + currentPlayer.getHand());
 
-            // Player's turn
-            if (!currentPlayer.hasValidCard(topCard)) {
-                Card drawnCard = currentPlayer.drawCard(deck);
-                if (drawnCard != null) {
-                    System.out.println(currentPlayer.getName() + " drew a card: " + drawnCard.getSuit() + " " + drawnCard.getRank());
-                } else {
-                    System.out.println("Draw pile is empty. The game ends in a draw.");
-                    gameEnded = true;
-                    break;
+            List<Card> hand = currentPlayer.getHand();
+
+            // Inputting player Choice for card
+            int playerChoice = -1;
+            while(playerChoice >= hand.size() || playerChoice < 0){
+
+                // Giving Instructions to the User About Play
+                this.printingInstructionstoUser(topCard,currentPlayer);
+
+                int counter = 0;
+                for (Card card:hand) {
+                    System.out.println("Enter " + counter++ + " " + card);
+                }
+
+                playerChoice = scanner.nextInt();
+                if (playerChoice == 10){
+                    Card drawnCard = currentPlayer.drawCard(deck);
+                    if (drawnCard != null) {
+                        System.out.println(currentPlayer.getName() + " drew a card: " + drawnCard.getSuit() + " " + drawnCard.getRank());
+                    } else {
+                        System.out.println("Draw pile is empty. The game ends in a draw.");
+                        gameEnded = true;
+                        break;
+                    }
                 }
             }
 
-            // Simulate playing a valid card
-            Card validCard = getValidCard(currentPlayer.getHand(), topCard);
-            if (validCard != null) {
-                currentPlayer.playCard(validCard, topCard);
-                discardPile.add(validCard);
-                topCard = validCard;
+            if (gameEnded) break;
 
-                // Check if the player has won
+            // Checking for playing a valid card if not stopping the game
+            boolean validCard = isValidCard(currentPlayer.getHand(), topCard,playerChoice);
+            if (validCard) {
+                Card playerValidCard = currentPlayer.getHand().get(playerChoice);
+                currentPlayer.playCard(playerValidCard, topCard);
+                discardPile.add(playerValidCard);
+                topCard = playerValidCard;
+
+                // Checking if the player has won
                 if (currentPlayer.getHand().isEmpty()) {
                     System.out.println(currentPlayer.getName() + " has won the game!");
                     gameEnded = true;
                     break;
                 }
 
-                // Handle action cards (bonus feature)
-                if (validCard.isActionCard()) {
-                    handleActionCard(validCard);
+                // Handling action cards
+                if (playerValidCard.isActionCard()) {
+                    handleActionCard(playerValidCard);
                 }
             }
 
-            // Move to the next player
+            // Moving to the next player
             updateCurrentPlayerIndex();
         }
     }
