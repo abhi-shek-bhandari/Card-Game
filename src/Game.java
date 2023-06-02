@@ -75,8 +75,9 @@ public class Game {
         if (topCard.isActionCard()) return true;
         int counter = 0;
         for (Card card : hand) {
-            if (counter++ == playerChoice && (card.getSuit() == topCard.getSuit() || card.getRank() == topCard.getRank())) {
-                return true;
+            if (counter++ == playerChoice) {
+                if (card.getSuit() == topCard.getSuit() || card.getRank() == topCard.getRank())
+                    return true;
             }
         }
         return false;
@@ -143,7 +144,7 @@ public class Game {
 
             // Inputting player Choice for card
             int playerChoice = -1;
-            while(!validCard && (playerChoice >= hand.size() || playerChoice < 0)){
+            while(!validCard || (playerChoice >= hand.size() || playerChoice < 0)){
 
                 // Giving Instructions to the User About Play
                 this.printingInstructionsToUser(topCard,currentPlayer);
@@ -163,34 +164,37 @@ public class Game {
                         gameEnded = true;
                         break;
                     }
-                }
+                } else {
+                    if (gameEnded) break;
 
-                if (gameEnded) break;
+                    // Checking for playing a valid card if not stopping the game
+                    validCard = isValidCard(currentPlayer.getHand(), topCard,playerChoice) || currentPlayer.getHand().get(playerChoice).isActionCard();
+                    if (validCard) {
+                        Card playerValidCard = currentPlayer.getHand().get(playerChoice);
+                        currentPlayer.playCard(playerValidCard, topCard);
+                        discardPile.add(playerValidCard);
+                        topCard = playerValidCard;
 
-                // Checking for playing a valid card if not stopping the game
-                validCard = isValidCard(currentPlayer.getHand(), topCard,playerChoice);
-                if (validCard) {
-                    Card playerValidCard = currentPlayer.getHand().get(playerChoice);
-                    currentPlayer.playCard(playerValidCard, topCard);
-                    discardPile.add(playerValidCard);
-                    topCard = playerValidCard;
+                        // Checking if the player has won
+                        if (currentPlayer.getHand().isEmpty()) {
+                            System.out.println(currentPlayer.getName() + " has won the game!");
+                            gameEnded = true;
+                            break;
+                        }
 
-                    // Checking if the player has won
-                    if (currentPlayer.getHand().isEmpty()) {
-                        System.out.println(currentPlayer.getName() + " has won the game!");
-                        gameEnded = true;
+                        // Handling action cards
+                        if (playerValidCard.isActionCard()) {
+                            handleActionCard(playerValidCard);
+                        }
                         break;
                     }
-
-                    // Handling action cards
-                    if (playerValidCard.isActionCard()) {
-                        handleActionCard(playerValidCard);
+                    else{
+                        // Giving Message to Player about queen card
+                        isQueenCard(currentPlayer.getHand().get(playerChoice), topCard);
                     }
                 }
-                else{
-                    // Giving Message to Player about queen card
-                    isQueenCard(currentPlayer.getHand().get(playerChoice), topCard);
-                }
+
+
             }
             // Moving to the next player
             updateCurrentPlayerIndex();
